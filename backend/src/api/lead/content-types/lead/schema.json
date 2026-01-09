@@ -25,6 +25,12 @@
     },
     "email": {
       "type": "email"
+    },
+    "workspace": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::workspace.workspace",
+      "inversedBy": "leads"
     }
   }
 }

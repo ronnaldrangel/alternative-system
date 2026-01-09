@@ -439,6 +439,10 @@ export interface ApiLeadLead extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    workspace: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::workspace.workspace'
+    >;
   };
 }
 
@@ -672,6 +676,7 @@ export interface ApiTicketTicket extends Struct.CollectionTypeSchema {
 export interface ApiWorkspaceWorkspace extends Struct.CollectionTypeSchema {
   collectionName: 'workspaces';
   info: {
+    description: '';
     displayName: 'Workspace';
     pluralName: 'workspaces';
     singularName: 'workspace';
@@ -684,6 +689,7 @@ export interface ApiWorkspaceWorkspace extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    leads: Schema.Attribute.Relation<'oneToMany', 'api::lead.lead'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',

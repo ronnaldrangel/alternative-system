@@ -4,7 +4,8 @@
   "info": {
     "singularName": "workspace",
     "pluralName": "workspaces",
-    "displayName": "Workspace"
+    "displayName": "Workspace",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -41,6 +42,12 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::order.order",
+      "mappedBy": "workspace"
+    },
+    "leads": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::lead.lead",
       "mappedBy": "workspace"
     }
   }

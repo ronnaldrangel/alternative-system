@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, User as UserIcon, Settings, LayoutDashboard } from 'lucide-react';
+import { LogOut, User as UserIcon, LayoutDashboard, Settings, Bell, Search } from 'lucide-react';
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -28,59 +28,106 @@ export default function DashboardPage() {
     if (!user) return null;
 
     return (
-        <div style={{ minHeight: '100vh', padding: '40px', background: 'var(--background)' }}>
-            <nav className="glass" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 40px', marginBottom: '40px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <LayoutDashboard size={24} color="var(--primary)" />
-                    <span style={{ fontWeight: 700, fontSize: '1.2rem' }}>Dashboard</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(to bottom right, var(--primary), var(--accent))', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                            <UserIcon size={18} color="white" />
+        <div className="min-h-screen bg-[#0a0a0c] text-white">
+            {/* Navbar */}
+            <nav className="border-b border-white/10 bg-white/5 backdrop-blur-md sticky top-0 z-50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between items-center h-16">
+                        <div className="flex items-center gap-2">
+                            <div className="bg-indigo-600 p-2 rounded-lg">
+                                <LayoutDashboard size={20} className="text-white" />
+                            </div>
+                            <span className="text-xl font-bold tracking-tight">Dashboard</span>
                         </div>
-                        <span style={{ fontWeight: 500 }}>{user.username}</span>
+
+                        <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
+                            <div className="relative w-full">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                <input
+                                    type="text"
+                                    placeholder="Buscar..."
+                                    className="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <button className="p-2 text-slate-400 hover:text-white transition-colors relative">
+                                <Bell size={20} />
+                                <span className="absolute top-2 right-2 w-2 h-2 bg-indigo-500 rounded-full border-2 border-[#0a0a0c]"></span>
+                            </button>
+
+                            <div className="h-8 w-[1px] bg-white/10"></div>
+
+                            <div className="flex items-center gap-3">
+                                <div className="text-right hidden sm:block">
+                                    <p className="text-sm font-medium leading-none">{user.username}</p>
+                                    <p className="text-xs text-slate-500 mt-1">{user.email}</p>
+                                </div>
+                                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center border-2 border-white/10 shadow-lg shadow-indigo-500/20">
+                                    <UserIcon size={20} className="text-white" />
+                                </div>
+                                <button
+                                    onClick={handleLogout}
+                                    className="ml-2 p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
+                                    title="Cerrar Sesión"
+                                >
+                                    <LogOut size={20} />
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <button
-                        onClick={handleLogout}
-                        style={{
-                            background: 'rgba(239, 68, 68, 0.1)',
-                            color: '#fca5a5',
-                            border: '1px solid rgba(239, 68, 68, 0.2)',
-                            padding: '8px 16px',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            transition: 'all 0.3s ease'
-                        }}
-                        onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)')}
-                        onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)')}
-                    >
-                        <LogOut size={16} />
-                        Cerrar Sesión
-                    </button>
                 </div>
             </nav>
 
-            <main>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-                    <div className="glass" style={{ padding: '32px' }}>
-                        <h2 style={{ marginBottom: '16px', fontSize: '1.5rem' }}>Bienvenido de nuevo!</h2>
-                        <p style={{ color: '#94a3b8' }}>Has iniciado sesión correctamente con Strapi. Esta es tu área privada personalizada.</p>
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <header className="mb-8">
+                    <h1 className="text-3xl font-bold">Bienvenido, {user.username.split('_')[0]} 👋</h1>
+                    <p className="text-slate-400 mt-2">Aquí tienes un resumen de tu cuenta premium.</p>
+                </header>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="glass p-6 flex flex-col gap-4">
+                        <div className="bg-indigo-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-indigo-400">
+                            <UserIcon size={24} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-semibold text-slate-200">Perfil del Usuario</h3>
+                            <div className="mt-4 space-y-3">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-500">ID de Usuario:</span>
+                                    <span className="font-mono text-indigo-400">{user.id}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-slate-500">Email:</span>
+                                    <span>{user.email}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="glass" style={{ padding: '32px' }}>
-                        <h2 style={{ marginBottom: '16px', fontSize: '1.5rem' }}>Tus Datos</h2>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ color: '#94a3b8' }}>Email:</span>
-                                <span>{user.email}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ color: '#94a3b8' }}>ID:</span>
-                                <span>{user.id}</span>
-                            </div>
+
+                    <div className="glass p-6 border-indigo-500/20 bg-indigo-500/5 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                            <Settings size={80} />
+                        </div>
+                        <div className="bg-purple-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-purple-400">
+                            <Settings size={24} />
+                        </div>
+                        <h3 className="text-lg font-semibold text-slate-200 mt-4">Configuración</h3>
+                        <p className="text-sm text-slate-400 mt-2">Gestiona las preferencias de tu cuenta y notificaciones.</p>
+                        <button className="mt-6 w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition-colors">
+                            Ir a ajustes
+                        </button>
+                    </div>
+
+                    <div className="glass p-6 bg-gradient-to-br from-indigo-600/20 to-transparent border-indigo-500/30">
+                        <div className="bg-amber-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-amber-400">
+                            <Bell size={24} />
+                        </div>
+                        <h3 className="text-lg font-semibold text-slate-200 mt-4">Novedades</h3>
+                        <p className="text-sm text-slate-400 mt-2">No tienes notificaciones pendientes en este momento.</p>
+                        <div className="mt-6 bg-white/5 rounded-lg p-3 text-xs text-slate-500 italic">
+                            "El éxito es la suma de pequeños esfuerzos repetidos día tras día."
                         </div>
                     </div>
                 </div>
