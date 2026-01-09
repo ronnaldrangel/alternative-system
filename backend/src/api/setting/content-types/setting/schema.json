@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "settings",
+  "info": {
+    "singularName": "setting",
+    "pluralName": "settings",
+    "displayName": "Setting"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "whatsapp": {
+      "type": "string"
+    },
+    "openai_key": {
+      "type": "string"
+    },
+    "gemini_key": {
+      "type": "string"
+    },
+    "workspace": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::workspace.workspace",
+      "mappedBy": "setting"
+    }
+  }
+}
