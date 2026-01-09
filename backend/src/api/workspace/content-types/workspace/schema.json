@@ -49,6 +49,15 @@
       "relation": "oneToMany",
       "target": "api::lead.lead",
       "mappedBy": "workspace"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "workspaces"
+    },
+    "slug": {
+      "type": "string"
     }
   }
 }

@@ -640,39 +640,6 @@ export interface ApiSubscriptionSubscription
   };
 }
 
-export interface ApiTicketTicket extends Struct.CollectionTypeSchema {
-  collectionName: 'tickets';
-  info: {
-    description: '';
-    displayName: 'Ticket';
-    pluralName: 'tickets';
-    singularName: 'ticket';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    email: Schema.Attribute.String;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::ticket.ticket'
-    > &
-      Schema.Attribute.Private;
-    name: Schema.Attribute.String;
-    prize: Schema.Attribute.JSON;
-    publishedAt: Schema.Attribute.DateTime;
-    redeem: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
-    type: Schema.Attribute.String;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiWorkspaceWorkspace extends Struct.CollectionTypeSchema {
   collectionName: 'workspaces';
   info: {
@@ -701,6 +668,7 @@ export interface ApiWorkspaceWorkspace extends Struct.CollectionTypeSchema {
     products: Schema.Attribute.Relation<'oneToMany', 'api::product.product'>;
     publishedAt: Schema.Attribute.DateTime;
     setting: Schema.Attribute.Relation<'oneToOne', 'api::setting.setting'>;
+    slug: Schema.Attribute.String;
     subscriptions: Schema.Attribute.Relation<
       'oneToMany',
       'api::subscription.subscription'
@@ -708,6 +676,10 @@ export interface ApiWorkspaceWorkspace extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
   };
 }
 
@@ -1166,7 +1138,6 @@ export interface PluginUsersPermissionsUser
   };
   options: {
     draftAndPublish: false;
-    timestamps: true;
   };
   attributes: {
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
@@ -1207,6 +1178,10 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 3;
       }>;
+    workspaces: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::workspace.workspace'
+    >;
   };
 }
 
@@ -1226,7 +1201,6 @@ declare module '@strapi/strapi' {
       'api::product.product': ApiProductProduct;
       'api::setting.setting': ApiSettingSetting;
       'api::subscription.subscription': ApiSubscriptionSubscription;
-      'api::ticket.ticket': ApiTicketTicket;
       'api::workspace.workspace': ApiWorkspaceWorkspace;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

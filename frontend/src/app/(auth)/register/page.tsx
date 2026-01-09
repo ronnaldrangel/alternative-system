@@ -16,6 +16,7 @@ export default function RegisterPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
+    const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
     //Password Requirements Checklist
     const requirements = [
@@ -70,7 +71,7 @@ export default function RegisterPage() {
                 </div>
             )}
 
-            <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+            <form className="flex flex-col gap-5" onSubmit={handleSubmit} autoComplete="off">
                 <div className="flex flex-col gap-2">
                     <label htmlFor="email" className="text-sm font-medium text-slate-200 ml-1">
                         Correo electrónico
@@ -80,10 +81,12 @@ export default function RegisterPage() {
                         <input
                             type="email"
                             id="email"
+                            name="email-field-random-id"
                             placeholder="tu@email.com"
                             className="input-field"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            autoComplete="off"
                             required
                         />
                     </div>
@@ -98,10 +101,14 @@ export default function RegisterPage() {
                         <input
                             type={showPassword ? "text" : "password"}
                             id="password"
+                            name="password-field-random-id"
                             placeholder="Crea una contraseña segura"
                             className="input-field"
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            onFocus={() => setIsPasswordFocused(true)}
+                            onBlur={() => setIsPasswordFocused(false)}
+                            autoComplete="new-password"
                             required
                         />
                         <button
@@ -113,21 +120,23 @@ export default function RegisterPage() {
                         </button>
                     </div>
 
-                    {/* Password Strength Checklist */}
-                    <div className="mt-2 space-y-2 bg-white/5 p-4 rounded-xl border border-white/5">
-                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Requisitos de seguridad:</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {requirements.map((req, idx) => {
-                                const isMet = req.test(formData.password);
-                                return (
-                                    <div key={idx} className={`flex items-center gap-2 text-xs transition-colors duration-300 ${isMet ? 'text-emerald-400' : 'text-slate-500'}`}>
-                                        {isMet ? <CheckCircle2 size={14} /> : <Circle size={14} />}
-                                        <span>{req.label}</span>
-                                    </div>
-                                );
-                            })}
+                    {/* Password Strength Checklist - Conditional Rendering */}
+                    {(isPasswordFocused || formData.password.length > 0) && !isPasswordSecure && (
+                        <div className="mt-2 space-y-2 bg-white/5 p-4 rounded-xl border border-white/5 animate-in fade-in slide-in-from-top-2 duration-300">
+                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Requisitos de seguridad:</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {requirements.map((req, idx) => {
+                                    const isMet = req.test(formData.password);
+                                    return (
+                                        <div key={idx} className={`flex items-center gap-2 text-xs transition-colors duration-300 ${isMet ? 'text-emerald-400' : 'text-slate-500'}`}>
+                                            {isMet ? <CheckCircle2 size={14} /> : <Circle size={14} />}
+                                            <span>{req.label}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 <button

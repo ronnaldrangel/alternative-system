@@ -30,3 +30,45 @@ export const loginUser = async (identifier: string, password: string) => {
     throw error.response?.data?.error || { message: 'An error occurred during login' };
   }
 };
+
+export const forgotPassword = async (email: string) => {
+  try {
+    const response = await strapi.post('/api/auth/forgot-password', {
+      email,
+    });
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data?.error || { message: 'An error occurred while requesting password reset' };
+  }
+};
+
+export const getWorkspaces = async (jwt: string) => {
+  try {
+    const response = await strapi.get('/api/workspaces', {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data?.error || { message: 'An error occurred while fetching workspaces' };
+  }
+};
+
+export const createWorkspace = async (name: string, jwt: string) => {
+  try {
+    const response = await strapi.post('/api/workspaces', {
+      data: {
+        name,
+        slug: name.toLowerCase().replace(/ /g, '-'),
+      }
+    }, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data?.error || { message: 'An error occurred while creating workspace' };
+  }
+};
