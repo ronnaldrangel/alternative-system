@@ -6,7 +6,8 @@ import {
   GalleryVerticalEnd,
   AudioWaveform,
   Command,
-  LayoutDashboard
+  LayoutDashboard,
+  Package
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -60,6 +61,13 @@ const data = {
       title: "Clientes",
       url: "/dashboard/clientes",
       icon: Users,
+      isActive: false,
+      items: [],
+    },
+    {
+      title: "Productos",
+      url: "/dashboard/productos",
+      icon: Package,
       isActive: false,
       items: [],
     },
