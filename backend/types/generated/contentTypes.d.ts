@@ -519,7 +519,7 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     singularName: 'order';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     client: Schema.Attribute.Relation<'manyToOne', 'api::client.client'>;
@@ -607,12 +607,13 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
 export interface ApiSettingSetting extends Struct.CollectionTypeSchema {
   collectionName: 'settings';
   info: {
+    description: '';
     displayName: 'Setting';
     pluralName: 'settings';
     singularName: 'setting';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
