@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { loginUser } from '@/lib/strapi';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -25,42 +29,45 @@ export default function LoginPage() {
             const data = await loginUser(formData.identifier, formData.password);
             localStorage.setItem('jwt', data.jwt);
             localStorage.setItem('user', JSON.stringify(data.user));
+            toast.success('¡Bienvenido de nuevo!');
             router.push('/dashboard');
         } catch (err: any) {
             setError(err.message || 'Error al iniciar sesión. Por favor verifica tus credenciales.');
+            toast.error('Error al iniciar sesión');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <>
-            <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent mb-2">
+        <div className="w-full max-w-md mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-center space-y-2">
+                <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                     Bienvenido
                 </h1>
-                <p className="text-slate-400">Ingresa tus credenciales para continuar</p>
+                <p className="text-muted-foreground text-sm">Ingresa tus credenciales para continuar</p>
             </div>
 
             {error && (
-                <div className="bg-red-500/10 border border-red-500/20 text-red-300 p-3 rounded-lg text-sm mb-5 flex items-center gap-2">
-                    <AlertCircle size={18} />
-                    <span>{error}</span>
-                </div>
+                <Alert variant="destructive" className="animate-in fade-in zoom-in duration-300">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                </Alert>
             )}
 
-            <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-                <div className="flex flex-col gap-2">
-                    <label htmlFor="identifier" className="text-sm font-medium text-slate-200 ml-1">
+            <form className="space-y-4" onSubmit={handleSubmit}>
+                <div className="space-y-2">
+                    <label htmlFor="identifier" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                         Usuario o Correo
                     </label>
-                    <div className="relative flex items-center">
-                        <Mail size={20} className="absolute left-3.5 text-slate-400" />
-                        <input
-                            type="text"
+                    <div className="relative">
+                        <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <Input
                             id="identifier"
+                            type="text"
                             placeholder="tu@email.com o usuario"
-                            className="input-field"
+                            className="pl-10 h-11"
                             value={formData.identifier}
                             onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
                             required
@@ -68,44 +75,54 @@ export default function LoginPage() {
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-2">
-                    <div className="flex justify-between items-center ml-1">
-                        <label htmlFor="password" className="text-sm font-medium text-slate-200">
+                <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                        <label htmlFor="password" className="text-sm font-medium leading-none">
                             Contraseña
                         </label>
-                        <Link href="/forgot-password" className="text-xs text-indigo-400 hover:underline">
+                        <Link href="/forgot-password" size="sm" className="text-xs text-primary hover:underline">
                             ¿Has olvidado tu contraseña?
                         </Link>
                     </div>
-                    <div className="relative flex items-center">
-                        <Lock size={20} className="absolute left-3.5 text-slate-400" />
-                        <input
-                            type={showPassword ? "text" : "password"}
+                    <div className="relative">
+                        <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                        <Input
                             id="password"
+                            type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
-                            className="input-field"
+                            className="pl-10 pr-10 h-11"
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                             required
                         />
-                        <button
+                        <Button
                             type="button"
-                            className="absolute right-3.5 text-slate-400 hover:text-white transition-colors"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground"
                             onClick={() => setShowPassword(!showPassword)}
                         >
-                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                        </button>
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </Button>
                     </div>
                 </div>
 
-                <button type="submit" className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed" disabled={loading}>
-                    {loading ? <Loader2 className="animate-spin" /> : 'Iniciar Sesión'}
-                </button>
+                <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={loading}>
+                    {loading ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Iniciando sesión...
+                        </>
+                    ) : 'Iniciar Sesión'}
+                </Button>
             </form>
 
-            <div className="text-center mt-6 text-slate-400 text-sm">
-                ¿No tienes una cuenta? <Link href="/register" className="text-indigo-400 font-semibold hover:underline">Regístrate gratis</Link>
+            <div className="text-center text-sm text-muted-foreground">
+                ¿No tienes una cuenta?{' '}
+                <Link href="/register" className="text-primary font-semibold hover:underline">
+                    Regístrate gratis
+                </Link>
             </div>
-        </>
+        </div>
     );
 }

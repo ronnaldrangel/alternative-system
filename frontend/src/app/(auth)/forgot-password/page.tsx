@@ -4,6 +4,11 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Mail, Loader2, AlertCircle, CheckCircle2, ChevronLeft } from 'lucide-react';
 import { forgotPassword } from '@/lib/strapi';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Card, CardContent } from '@/components/ui/card';
+import { toast } from 'sonner';
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState('');
@@ -20,60 +25,70 @@ export default function ForgotPasswordPage() {
         try {
             await forgotPassword(email);
             setSuccess(true);
+            toast.success('Petición enviada correctamente');
         } catch (err: any) {
             setError(err.message || 'Error al procesar la solicitud. Intenta de nuevo.');
+            toast.error('Error al enviar el enlace');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <>
-            <div className="text-center mb-8">
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent mb-2">
-                    Recuperar Cuenta
+        <div className="w-full max-w-md mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="text-center space-y-2">
+                <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                    {success ? 'Verifica tu buzón' : 'Recuperar Cuenta'}
                 </h1>
-                <p className="text-slate-400">Te enviaremos un enlace para restablecer tu contraseña</p>
+                <p className="text-muted-foreground text-sm">
+                    {success
+                        ? 'Te hemos enviado las instrucciones por correo'
+                        : 'Te enviaremos un enlace para restablecer tu contraseña'
+                    }
+                </p>
             </div>
 
             {success ? (
-                <div className="text-center animate-in fade-in zoom-in duration-500">
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-6 rounded-2xl flex flex-col items-center gap-4 mb-6">
-                        <CheckCircle2 size={48} className="text-emerald-500" />
-                        <p className="font-medium text-lg">¡Correo enviado con éxito!</p>
-                        <p className="text-sm text-slate-400 text-center">
-                            Revisa tu bandeja de entrada y sigue las instrucciones para recuperar tu acceso.
-                        </p>
-                    </div>
-                    <Link
-                        href="/login"
-                        className="btn-primary w-full inline-flex items-center justify-center"
-                    >
-                        Volver al inicio de sesión
-                    </Link>
+                <div className="space-y-6 animate-in fade-in zoom-in duration-500 text-center">
+                    <Card className="border-emerald-500/20 bg-emerald-500/5">
+                        <CardContent className="pt-6 pb-6 flex flex-col items-center gap-4">
+                            <div className="h-16 w-16 bg-emerald-500/20 rounded-full flex items-center justify-center">
+                                <CheckCircle2 className="h-10 w-10 text-emerald-500" />
+                            </div>
+                            <div className="space-y-2">
+                                <p className="font-semibold text-lg text-emerald-500">¡Correo enviado!</p>
+                                <p className="text-sm text-muted-foreground">
+                                    Revisa tu bandeja de entrada y sigue las instrucciones para recuperar tu acceso.
+                                </p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Button asChild className="w-full h-11">
+                        <Link href="/login">Volver al inicio de sesión</Link>
+                    </Button>
                 </div>
             ) : (
                 <>
                     {error && (
-                        <div className="bg-red-500/10 border border-red-500/20 text-red-300 p-3 rounded-lg text-sm mb-5 flex items-center gap-2">
-                            <AlertCircle size={18} />
-                            <span>{error}</span>
-                        </div>
+                        <Alert variant="destructive" className="animate-in fade-in zoom-in duration-300">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertTitle>Error</AlertTitle>
+                            <AlertDescription>{error}</AlertDescription>
+                        </Alert>
                     )}
 
-                    <form className="flex flex-col gap-5" onSubmit={handleSubmit} autoComplete="off">
-                        <div className="flex flex-col gap-2">
-                            <label htmlFor="email" className="text-sm font-medium text-slate-200 ml-1">
+                    <form className="space-y-4" onSubmit={handleSubmit} autoComplete="off">
+                        <div className="space-y-2">
+                            <label htmlFor="email" className="text-sm font-medium leading-none">
                                 Correo electrónico
                             </label>
-                            <div className="relative flex items-center">
-                                <Mail size={20} className="absolute left-3.5 text-slate-400" />
-                                <input
-                                    type="email"
+                            <div className="relative">
+                                <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                <Input
                                     id="email"
-                                    name="email"
+                                    type="email"
                                     placeholder="tu@email.com"
-                                    className="input-field"
+                                    className="pl-10 h-11"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     autoComplete="off"
@@ -82,26 +97,26 @@ export default function ForgotPasswordPage() {
                             </div>
                         </div>
 
-                        <button
-                            type="submit"
-                            className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={loading}
-                        >
-                            {loading ? <Loader2 className="animate-spin" /> : 'Enviar enlace de recuperación'}
-                        </button>
+                        <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={loading}>
+                            {loading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Enviando enlace...
+                                </>
+                            ) : 'Enviar enlace de recuperación'}
+                        </Button>
                     </form>
 
-                    <div className="text-center mt-6 flex flex-col gap-4">
-                        <Link
-                            href="/login"
-                            className="text-slate-400 text-sm hover:text-white transition-colors flex items-center justify-center gap-2 group"
-                        >
-                            <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                            Cancelar y volver
-                        </Link>
+                    <div className="text-center pt-2">
+                        <Button variant="ghost" asChild className="text-muted-foreground hover:text-foreground">
+                            <Link href="/login" className="flex items-center gap-2">
+                                <ChevronLeft size={16} />
+                                Volver al inicio de sesión
+                            </Link>
+                        </Button>
                     </div>
                 </>
             )}
-        </>
+        </div>
     );
 }

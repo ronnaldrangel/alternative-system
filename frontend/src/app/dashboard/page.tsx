@@ -3,8 +3,23 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { LogOut, User as UserIcon, LayoutDashboard, Settings, Bell, Search, Layout, ChevronDown } from 'lucide-react';
+import { LogOut, User as UserIcon, LayoutDashboard, Settings, Bell, Search, Layout, ChevronDown, Rocket, Users, Plus } from 'lucide-react';
 import WorkspaceManager from '@/components/WorkspaceManager';
+import { ThemeToggle } from '@/components/theme-toggle';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Toaster } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 
 interface Workspace {
     id: number;
@@ -40,84 +55,122 @@ export default function DashboardPage() {
         localStorage.removeItem('user');
         localStorage.removeItem('currentWorkspace');
         router.push('/login');
+        toast.info('Sesión cerrada');
     };
 
     const handleWorkspaceSelected = (workspace: Workspace) => {
         setCurrentWorkspace(workspace);
         localStorage.setItem('currentWorkspace', JSON.stringify(workspace));
         setIsSelectingWorkspace(false);
+        toast.success(`Cambiado a ${workspace.name}`);
     };
 
     if (!user) return null;
 
     if (isSelectingWorkspace) {
-        return <WorkspaceManager onWorkspaceSelected={handleWorkspaceSelected} />;
+        return (
+            <>
+                <WorkspaceManager onWorkspaceSelected={handleWorkspaceSelected} />
+                <Toaster richColors position="top-center" />
+            </>
+        );
     }
 
     return (
-        <div className="min-h-screen bg-[#0a0a0c] text-white">
+        <div className="min-h-screen bg-background text-foreground">
+            <Toaster richColors position="top-right" />
+
             {/* Navbar */}
-            <nav className="border-b border-white/10 bg-white/5 backdrop-blur-md sticky top-0 z-50">
+            <nav className="border-b border-border/40 bg-background/50 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center gap-6">
                             <div className="flex items-center gap-2">
-                                <div className="bg-indigo-600 p-2 rounded-lg">
-                                    <LayoutDashboard size={20} className="text-white" />
+                                <div className="bg-primary p-2 rounded-lg">
+                                    <LayoutDashboard size={20} className="text-primary-foreground" />
                                 </div>
-                                <span className="text-xl font-bold tracking-tight">Dashboard</span>
+                                <span className="text-xl font-bold tracking-tight">App</span>
                             </div>
 
-                            <div className="h-6 w-[1px] bg-white/10 hidden sm:block"></div>
+                            <div className="h-6 w-[1px] bg-border/40 hidden sm:block"></div>
 
                             {/* Workspace Switcher */}
-                            <button
-                                onClick={() => setIsSelectingWorkspace(true)}
-                                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all group"
-                            >
-                                <Layout size={16} className="text-indigo-400" />
-                                <span className="text-sm font-medium text-slate-300 group-hover:text-white">
-                                    {currentWorkspace?.name || 'Seleccionar Workspace'}
-                                </span>
-                                <ChevronDown size={14} className="text-slate-500" />
-                            </button>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="flex items-center gap-2 group px-3 border border-border/40 bg-secondary/50">
+                                        <Layout size={16} className="text-primary" />
+                                        <span className="text-sm font-medium">
+                                            {currentWorkspace?.name || 'Seleccionar Workspace'}
+                                        </span>
+                                        <ChevronDown size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start" className="w-[200px]">
+                                    <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={() => setIsSelectingWorkspace(true)}>
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Gestionar Workspaces
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
 
                         <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
                             <div className="relative w-full">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                                <input
-                                    type="text"
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                                <Input
                                     placeholder="Buscar..."
-                                    className="w-full bg-white/5 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 transition-all"
+                                    className="w-full bg-secondary/50 rounded-full pl-10 h-9 border-border/40 focus:ring-1"
                                 />
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                            <button className="p-2 text-slate-400 hover:text-white transition-colors relative">
+                        <div className="flex items-center gap-2">
+                            <ThemeToggle />
+                            <Button variant="ghost" size="icon" className="text-muted-foreground relative">
                                 <Bell size={20} />
-                                <span className="absolute top-2 right-2 w-2 h-2 bg-indigo-500 rounded-full border-2 border-[#0a0a0c]"></span>
-                            </button>
+                                <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-background"></span>
+                            </Button>
 
-                            <div className="h-8 w-[1px] bg-white/10"></div>
+                            <div className="h-8 w-[1px] bg-border/40 mx-2"></div>
 
-                            <div className="flex items-center gap-3">
-                                <div className="text-right hidden lg:block">
-                                    <p className="text-sm font-medium leading-none">{user.username}</p>
-                                    <p className="text-xs text-slate-500 mt-1">{user.email}</p>
-                                </div>
-                                <Link href="/dashboard/profile" className="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center border-2 border-white/10 shadow-lg shadow-indigo-500/20 hover:scale-105 transition-transform active:scale-95 cursor-pointer">
-                                    <UserIcon size={20} className="text-white" />
-                                </Link>
-                                <button
-                                    onClick={handleLogout}
-                                    className="ml-2 p-2 text-red-400 hover:bg-red-400/10 rounded-lg transition-all"
-                                    title="Cerrar Sesión"
-                                >
-                                    <LogOut size={20} />
-                                </button>
-                            </div>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="p-0 h-10 w-10 rounded-full hover:scale-105 transition-transform active:scale-95">
+                                        <Avatar className="h-10 w-10 border border-border/40 shadow-sm">
+                                            <AvatarImage src={`https://avatar.vercel.sh/${user.username}`} />
+                                            <AvatarFallback className="bg-primary/10 text-primary">
+                                                {user.username.substring(0, 2).toUpperCase()}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56">
+                                    <DropdownMenuLabel className="font-normal">
+                                        <div className="flex flex-col space-y-1">
+                                            <p className="text-sm font-medium leading-none">{user.username}</p>
+                                            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                                        </div>
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/dashboard/profile">
+                                            <UserIcon className="mr-2 h-4 w-4" />
+                                            Perfil
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        <Settings className="mr-2 h-4 w-4" />
+                                        Ajustes
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+                                        <LogOut className="mr-2 h-4 w-4" />
+                                        Cerrar Sesión
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     </div>
                 </div>
@@ -127,61 +180,75 @@ export default function DashboardPage() {
                 <header className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                     <div>
                         <div className="flex items-center gap-2 mb-2">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-primary/10 text-primary border border-primary/20">
                                 Workspace: {currentWorkspace?.name}
                             </span>
                         </div>
-                        <h1 className="text-3xl font-bold text-white leading-tight">
+                        <h1 className="text-3xl font-bold tracking-tight">
                             Bienvenido, {user.username.split('_')[0]} 👋
                         </h1>
-                        <p className="text-slate-400 mt-1">Aquí tienes un resumen de lo que está pasando en este workspace.</p>
+                        <p className="text-muted-foreground mt-1">Aquí tienes un resumen de lo que está pasando en este workspace.</p>
                     </div>
+                    <Button className="gap-2">
+                        <Rocket size={18} />
+                        Acción Rápida
+                    </Button>
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Link href="/dashboard/profile" className="glass p-6 flex flex-col gap-4 hover:border-indigo-500/50 transition-all group cursor-pointer transition-all duration-300">
-                        <div className="bg-indigo-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
-                            <UserIcon size={24} />
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-semibold text-slate-200">Perfil del Usuario</h3>
-                            <div className="mt-4 space-y-3">
+                    <Card className="hover:border-primary/50 transition-all cursor-pointer group">
+                        <CardHeader>
+                            <div className="bg-primary/10 w-12 h-12 rounded-xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform mb-2">
+                                <Users size={24} />
+                            </div>
+                            <CardTitle>Usuarios</CardTitle>
+                            <CardDescription>Gestión de usuarios del workspace</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-3">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-slate-500">ID de Usuario:</span>
-                                    <span className="font-mono text-indigo-400">{user.id}</span>
+                                    <span className="text-muted-foreground">Activos:</span>
+                                    <span className="font-semibold">12</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-slate-500">Email:</span>
-                                    <span className="text-slate-300">{user.email}</span>
+                                    <span className="text-muted-foreground">Nuevos (hoy):</span>
+                                    <span className="text-primary font-semibold">+2</span>
                                 </div>
                             </div>
-                        </div>
-                    </Link>
+                        </CardContent>
+                    </Card>
 
-                    <div className="glass p-6 border-indigo-500/20 bg-indigo-500/5 relative overflow-hidden group transition-all duration-300">
-                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                            <Settings size={80} />
-                        </div>
-                        <div className="bg-purple-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-purple-400">
-                            <Settings size={24} />
-                        </div>
-                        <h3 className="text-lg font-semibold text-slate-200 mt-4">Configuración de Workspace</h3>
-                        <p className="text-sm text-slate-400 mt-2">Gestiona las preferencias de "{currentWorkspace?.name}" y notificaciones.</p>
-                        <button className="mt-6 w-full py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium transition-colors">
-                            Ir a ajustes
-                        </button>
-                    </div>
+                    <Card className="hover:border-primary/50 transition-all cursor-pointer group">
+                        <CardHeader>
+                            <div className="bg-primary/10 w-12 h-12 rounded-xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform mb-2">
+                                <Settings size={24} />
+                            </div>
+                            <CardTitle>Configuración</CardTitle>
+                            <CardDescription>Ajustes generales del workspace</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground">
+                                Modifica el nombre, el slug y los permisos generales para este espacio.
+                            </p>
+                            <Button variant="outline" className="w-full mt-4 h-9">Editar configuración</Button>
+                        </CardContent>
+                    </Card>
 
-                    <div className="glass p-6 bg-gradient-to-br from-indigo-600/20 to-transparent border-indigo-500/30 transition-all duration-300">
-                        <div className="bg-amber-500/20 w-12 h-12 rounded-xl flex items-center justify-center text-amber-400">
-                            <Bell size={24} />
-                        </div>
-                        <h3 className="text-lg font-semibold text-slate-200 mt-4">Novedades</h3>
-                        <p className="text-sm text-slate-400 mt-2">No tienes notificaciones pendientes en este workspace.</p>
-                        <div className="mt-6 bg-white/5 rounded-lg p-3 text-xs text-slate-500 italic">
-                            "El éxito es la suma de pequeños esfuerzos repetidos día tras día."
-                        </div>
-                    </div>
+                    <Card className="bg-primary text-primary-foreground">
+                        <CardHeader>
+                            <div className="bg-white/20 w-12 h-12 rounded-xl flex items-center justify-center mb-2">
+                                <Rocket size={24} />
+                            </div>
+                            <CardTitle className="text-white">Plan Premium</CardTitle>
+                            <CardDescription className="text-white/80">Tu cuenta tiene acceso a todas las funciones</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="p-3 bg-white/10 rounded-lg text-xs italic">
+                                "El éxito es la suma de pequeños esfuerzos repetidos día tras día."
+                            </div>
+                            <Button variant="secondary" className="w-full mt-4 h-9">Ver beneficios</Button>
+                        </CardContent>
+                    </Card>
                 </div>
             </main>
         </div>
