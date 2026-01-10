@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/sonner";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function AuthLayout({
     children,
@@ -6,15 +7,33 @@ export default function AuthLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen flex items-center justify-center p-6 bg-background relative overflow-hidden font-sans">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-muted p-6 md:p-10">
             <Toaster richColors position="top-right" />
-
-            {/* Background Orbs */}
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2 -z-10"></div>
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 blur-[120px] rounded-full -translate-x-1/2 translate-y-1/2 -z-10"></div>
-
-            <div className="w-full max-w-[480px] border border-border/40 bg-card/50 backdrop-blur-xl p-8 sm:p-12 rounded-[32px] shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-700">
-                {children}
+            <div className="w-full max-w-sm md:max-w-4xl">
+                <Card className="overflow-hidden rounded-xl shadow-xl">
+                    <CardContent className="grid p-0 md:grid-cols-2 min-h-[500px]">
+                        <div className="flex flex-col justify-center p-6 md:p-8 bg-card">
+                            {children}
+                        </div>
+                        <div className="relative hidden bg-zinc-900 md:block">
+                            <img
+                                src="https://images.unsplash.com/photo-1664575602276-acd073f104c1?q=80&w=2070&auto=format&fit=crop"
+                                alt="Authentication background"
+                                className="absolute inset-0 h-full w-full object-cover opacity-80"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-8 text-white">
+                                <h3 className="text-2xl font-bold">Alternative System</h3>
+                                <p className="text-sm text-zinc-300 mt-2">
+                                    Secure, fast, and reliable platform for your business needs.
+                                </p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+                <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary mt-8">
+                    By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
+                    and <a href="#">Privacy Policy</a>.
+                </div>
             </div>
         </div>
     );

@@ -35,12 +35,12 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        <div className="w-full max-w-md mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center space-y-2">
-                <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+        <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex flex-col items-center text-center">
+                <h1 className="text-2xl font-bold">
                     {success ? 'Verifica tu buzón' : 'Recuperar Cuenta'}
                 </h1>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-balance text-muted-foreground">
                     {success
                         ? 'Te hemos enviado las instrucciones por correo'
                         : 'Te enviaremos un enlace para restablecer tu contraseña'
@@ -49,20 +49,18 @@ export default function ForgotPasswordPage() {
             </div>
 
             {success ? (
-                <div className="space-y-6 animate-in fade-in zoom-in duration-500 text-center">
-                    <Card className="border-emerald-500/20 bg-emerald-500/5">
-                        <CardContent className="pt-6 pb-6 flex flex-col items-center gap-4">
-                            <div className="h-16 w-16 bg-emerald-500/20 rounded-full flex items-center justify-center">
-                                <CheckCircle2 className="h-10 w-10 text-emerald-500" />
-                            </div>
-                            <div className="space-y-2">
-                                <p className="font-semibold text-lg text-emerald-500">¡Correo enviado!</p>
-                                <p className="text-sm text-muted-foreground">
-                                    Revisa tu bandeja de entrada y sigue las instrucciones para recuperar tu acceso.
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
+                <div className="grid gap-6 animate-in fade-in zoom-in duration-500 text-center">
+                    <div className="p-6 rounded-xl border border-emerald-500/20 bg-emerald-500/5 flex flex-col items-center gap-4">
+                        <div className="h-16 w-16 bg-emerald-500/20 rounded-full flex items-center justify-center">
+                            <CheckCircle2 className="h-10 w-10 text-emerald-500" />
+                        </div>
+                        <div className="space-y-2">
+                            <p className="font-semibold text-lg text-emerald-500">¡Correo enviado!</p>
+                            <p className="text-sm text-muted-foreground">
+                                Revisa tu bandeja de entrada y sigue las instrucciones para recuperar tu acceso.
+                            </p>
+                        </div>
+                    </div>
                     <Button asChild className="w-full h-11">
                         <Link href="/login">Volver al inicio de sesión</Link>
                     </Button>
@@ -77,8 +75,8 @@ export default function ForgotPasswordPage() {
                         </Alert>
                     )}
 
-                    <form className="space-y-4" onSubmit={handleSubmit} autoComplete="off">
-                        <div className="space-y-2">
+                    <form className="grid gap-6" onSubmit={handleSubmit} autoComplete="off">
+                        <div className="grid gap-2">
                             <label htmlFor="email" className="text-sm font-medium leading-none">
                                 Correo electrónico
                             </label>
@@ -107,13 +105,11 @@ export default function ForgotPasswordPage() {
                         </Button>
                     </form>
 
-                    <div className="text-center pt-2">
-                        <Button variant="ghost" asChild className="text-muted-foreground hover:text-foreground">
-                            <Link href="/login" className="flex items-center gap-2">
-                                <ChevronLeft size={16} />
-                                Volver al inicio de sesión
-                            </Link>
-                        </Button>
+                    <div className="text-center text-sm">
+                        <Link href="/login" className="flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <ChevronLeft size={14} />
+                            Volver al inicio de sesión
+                        </Link>
                     </div>
                 </>
             )}

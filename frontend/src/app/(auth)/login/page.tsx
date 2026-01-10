@@ -40,12 +40,14 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="w-full max-w-md mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center space-y-2">
-                <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+        <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex flex-col items-center text-center">
+                <h1 className="text-2xl font-bold">
                     Bienvenido
                 </h1>
-                <p className="text-muted-foreground text-sm">Ingresa tus credenciales para continuar</p>
+                <p className="text-balance text-muted-foreground">
+                    Ingresa tus credenciales para continuar
+                </p>
             </div>
 
             {error && (
@@ -56,8 +58,8 @@ export default function LoginPage() {
                 </Alert>
             )}
 
-            <form className="space-y-4" onSubmit={handleSubmit}>
-                <div className="space-y-2">
+            <form className="grid gap-6" onSubmit={handleSubmit}>
+                <div className="grid gap-2">
                     <label htmlFor="identifier" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                         Usuario o Correo
                     </label>
@@ -75,12 +77,12 @@ export default function LoginPage() {
                     </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="grid gap-2">
                     <div className="flex justify-between items-center">
                         <label htmlFor="password" className="text-sm font-medium leading-none">
                             Contraseña
                         </label>
-                        <Link href="/forgot-password" size="sm" className="text-xs text-primary hover:underline">
+                        <Link href="/forgot-password" className="text-xs text-primary hover:underline underline-offset-4">
                             ¿Has olvidado tu contraseña?
                         </Link>
                     </div>
@@ -117,9 +119,9 @@ export default function LoginPage() {
                 </Button>
             </form>
 
-            <div className="text-center text-sm text-muted-foreground">
+            <div className="text-center text-sm text-balance">
                 ¿No tienes una cuenta?{' '}
-                <Link href="/register" className="text-primary font-semibold hover:underline">
+                <Link href="/register" className="underline underline-offset-4 hover:text-primary">
                     Regístrate gratis
                 </Link>
             </div>

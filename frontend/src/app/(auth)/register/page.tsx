@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, Loader2, AlertCircle, Eye, EyeOff, CheckCircle2, Circle } from 'lucide-react';
+import { Mail, Lock, Loader2, AlertCircle, Eye, EyeOff, CheckCircle2, Circle, Check } from 'lucide-react';
 import { registerUser } from '@/lib/strapi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,10 +24,11 @@ export default function RegisterPage() {
 
     // Password Requirements Checklist
     const requirements = [
-        { label: 'Mínimo 8 caracteres', test: (p: string) => p.length >= 8 },
         { label: 'Una letra mayúscula', test: (p: string) => /[A-Z]/.test(p) },
+        { label: 'Una letra minúscula', test: (p: string) => /[a-z]/.test(p) },
         { label: 'Un número', test: (p: string) => /[0-9]/.test(p) },
-        { label: 'Un carácter especial', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
+        { label: 'Un carácter especial (ej. !?<>@#$%)', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
+        { label: '8 caracteres o más', test: (p: string) => p.length >= 8 },
     ];
 
     const isPasswordSecure = requirements.every(req => req.test(formData.password));
@@ -63,12 +64,14 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="w-full max-w-md mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center space-y-2">
-                <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+        <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex flex-col items-center text-center">
+                <h1 className="text-2xl font-bold">
                     Crear Cuenta
                 </h1>
-                <p className="text-muted-foreground text-sm">Únete a nuestra plataforma premium</p>
+                <p className="text-balance text-muted-foreground">
+                    Únete a nuestra plataforma premium
+                </p>
             </div>
 
             {error && (
@@ -79,8 +82,8 @@ export default function RegisterPage() {
                 </Alert>
             )}
 
-            <form className="space-y-4" onSubmit={handleSubmit} autoComplete="off">
-                <div className="space-y-2">
+            <form className="grid gap-6" onSubmit={handleSubmit} autoComplete="off">
+                <div className="grid gap-2">
                     <label htmlFor="email" className="text-sm font-medium leading-none">
                         Correo electrónico
                     </label>
@@ -99,7 +102,7 @@ export default function RegisterPage() {
                     </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="grid gap-2">
                     <label htmlFor="password" className="text-sm font-medium leading-none">
                         Contraseña
                     </label>
@@ -130,19 +133,28 @@ export default function RegisterPage() {
 
                     {/* Password Strength Checklist */}
                     {(isPasswordFocused || formData.password.length > 0) && !isPasswordSecure && (
-                        <div className="mt-3 p-4 bg-secondary/50 rounded-xl border border-border/40 animate-in fade-in slide-in-from-top-2 duration-300">
-                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Seguridad de la contraseña:</p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                {requirements.map((req, idx) => {
-                                    const isMet = req.test(formData.password);
-                                    return (
-                                        <div key={idx} className={`flex items-center gap-2 text-xs transition-colors duration-300 ${isMet ? 'text-emerald-500' : 'text-muted-foreground'}`}>
-                                            {isMet ? <CheckCircle2 size={14} className="text-emerald-500" /> : <Circle size={14} />}
-                                            <span>{req.label}</span>
+                        <div className="mt-4 space-y-2 lg:space-y-3 animate-in fade-in slide-in-from-top-2 duration-300 transform-gpu">
+                            {requirements.map((req, idx) => {
+                                const isMet = req.test(formData.password);
+                                return (
+                                    <div
+                                        key={idx}
+                                        className={`flex items-center gap-2 text-xs transition-all duration-300 ${isMet ? 'text-primary font-medium translate-x-1' : 'text-muted-foreground'
+                                            }`}
+                                    >
+                                        <div className={`
+                                            flex items-center justify-center w-4 h-4 rounded-full border transition-all duration-300
+                                            ${isMet
+                                                ? 'bg-primary border-primary text-primary-foreground'
+                                                : 'border-muted-foreground/30 bg-transparent'
+                                            }
+                                        `}>
+                                            {isMet && <Check size={10} strokeWidth={3} className="animate-in zoom-in duration-300" />}
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                        <span>{req.label}</span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
@@ -161,9 +173,9 @@ export default function RegisterPage() {
                 </Button>
             </form>
 
-            <div className="text-center text-sm text-muted-foreground">
+            <div className="text-center text-sm text-balance">
                 ¿Ya tienes una cuenta?{' '}
-                <Link href="/login" className="text-primary font-semibold hover:underline">
+                <Link href="/login" className="underline underline-offset-4 hover:text-primary">
                     Inicia sesión
                 </Link>
             </div>
