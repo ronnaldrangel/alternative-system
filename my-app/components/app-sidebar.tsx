@@ -157,6 +157,24 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [user, setUser] = React.useState(data.user)
+
+  React.useEffect(() => {
+    const userStr = localStorage.getItem("user")
+    if (userStr) {
+      try {
+        const userData = JSON.parse(userStr)
+        setUser({
+          name: userData.username || "User",
+          email: userData.email || "",
+          avatar: "/avatars/shadcn.jpg", // Keep default avatar for now
+        })
+      } catch (e) {
+        console.error("Failed to parse user data", e)
+      }
+    }
+  }, [])
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -167,7 +185,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
