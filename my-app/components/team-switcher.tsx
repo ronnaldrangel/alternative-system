@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { ChevronsUpDown, Plus } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import {
   DropdownMenu,
@@ -18,6 +19,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { getSelectedWorkspace, setSelectedWorkspace } from "@/lib/workspace-service"
 
 export function TeamSwitcher({
   teams,
@@ -26,10 +28,25 @@ export function TeamSwitcher({
     name: string
     logo: React.ElementType
     plan: string
+    id?: string | number
   }[]
 }) {
   const { isMobile } = useSidebar()
+  const router = useRouter()
   const [activeTeam, setActiveTeam] = React.useState(teams[0])
+
+  // Update active team if teams prop changes and activeTeam is not in it anymore or just to sync
+  React.useEffect(() => {
+    // Attempt to sync with selected workspace from local storage first
+    const saved = getSelectedWorkspace()
+    const savedInTeams = saved ? teams.find(t => t.id === saved.id) : null
+
+    if (savedInTeams) {
+      setActiveTeam(savedInTeams)
+    } else if (teams.length > 0 && !teams.find(t => t.name === activeTeam.name)) {
+      setActiveTeam(teams[0])
+    }
+  }, [teams]) // removed activeTeam dependency to avoid loop when setting it
 
   if (!activeTeam) {
     return null
@@ -61,12 +78,16 @@ export function TeamSwitcher({
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-muted-foreground text-xs">
-              Teams
+              Workspaces
             </DropdownMenuLabel>
             {teams.map((team, index) => (
               <DropdownMenuItem
                 key={team.name}
-                onClick={() => setActiveTeam(team)}
+                onClick={() => {
+                  setActiveTeam(team)
+                  setSelectedWorkspace(team)
+                  window.location.reload()
+                }}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-md border">
@@ -77,11 +98,11 @@ export function TeamSwitcher({
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
+            <DropdownMenuItem className="gap-2 p-2" onClick={() => router.push('/workspace')}>
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                 <Plus className="size-4" />
               </div>
-              <div className="text-muted-foreground font-medium">Add team</div>
+              <div className="text-muted-foreground font-medium">Add Workspace</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

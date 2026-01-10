@@ -56,18 +56,6 @@
         }
       }
     },
-    "salePriceMX": {
-      "type": "decimal"
-    },
-    "regularPriceMX": {
-      "type": "decimal"
-    },
-    "salePriceBR": {
-      "type": "decimal"
-    },
-    "regularPriceBR": {
-      "type": "decimal"
-    },
     "order": {
       "type": "relation",
       "relation": "manyToOne",
@@ -75,29 +63,31 @@
       "inversedBy": "products"
     },
     "thumbnail": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
       "allowedTypes": [
         "images",
         "files",
         "videos",
         "audios"
-      ],
-      "type": "media",
-      "multiple": false
+      ]
     },
-    "description_wsp": {
+    "description_full": {
       "type": "text"
     },
     "trust_media": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
       "allowedTypes": [
         "images",
         "files",
         "videos",
         "audios"
-      ],
-      "type": "media",
-      "multiple": false
+      ]
     },
-    "description": {
+    "description_short": {
       "type": "text"
     },
     "workspace": {
@@ -105,6 +95,16 @@
       "relation": "manyToOne",
       "target": "api::workspace.workspace",
       "inversedBy": "products"
+    },
+    "tutorial": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
     }
   }
 }

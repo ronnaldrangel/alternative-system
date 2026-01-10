@@ -369,9 +369,69 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiBankAccountBankAccount extends Struct.CollectionTypeSchema {
+  collectionName: 'bank_accounts';
+  info: {
+    displayName: 'Bank_Account';
+    pluralName: 'bank-accounts';
+    singularName: 'bank-account';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    descripcion: Schema.Attribute.String;
+    id_account: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::bank-account.bank-account'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiBillBill extends Struct.CollectionTypeSchema {
+  collectionName: 'bills';
+  info: {
+    displayName: 'Bill';
+    pluralName: 'bills';
+    singularName: 'bill';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    amount: Schema.Attribute.Decimal;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    date: Schema.Attribute.Date;
+    description: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::bill.bill'> &
+      Schema.Attribute.Private;
+    observations: Schema.Attribute.Text;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    voucher: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+  };
+}
+
 export interface ApiClientClient extends Struct.CollectionTypeSchema {
   collectionName: 'clients';
   info: {
+    description: '';
     displayName: 'Client';
     pluralName: 'clients';
     singularName: 'client';
@@ -387,8 +447,7 @@ export interface ApiClientClient extends Struct.CollectionTypeSchema {
     date_birth: Schema.Attribute.Date;
     dni: Schema.Attribute.Integer;
     email: Schema.Attribute.Email;
-    first_name: Schema.Attribute.String;
-    last_name: Schema.Attribute.String;
+    full_name: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -402,6 +461,11 @@ export interface ApiClientClient extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::subscription.subscription'
     >;
+    type: Schema.Attribute.Enumeration<
+      ['Cliente', 'Proveedor', 'Cliente/Proveedor']
+    > &
+      Schema.Attribute.DefaultTo<'Cliente'>;
+    type_dni: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -513,8 +577,8 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    description: Schema.Attribute.Text;
-    description_wsp: Schema.Attribute.Text;
+    description_full: Schema.Attribute.Text;
+    description_short: Schema.Attribute.Text;
     gallery: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios',
       true
@@ -543,20 +607,17 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
-    regularPriceBR: Schema.Attribute.Decimal;
-    regularPriceMX: Schema.Attribute.Decimal;
     salePrice: Schema.Attribute.Decimal &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
         };
       }>;
-    salePriceBR: Schema.Attribute.Decimal;
-    salePriceMX: Schema.Attribute.Decimal;
     thumbnail: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     trust_media: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
     >;
+    tutorial: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1195,6 +1256,8 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::bank-account.bank-account': ApiBankAccountBankAccount;
+      'api::bill.bill': ApiBillBill;
       'api::client.client': ApiClientClient;
       'api::lead.lead': ApiLeadLead;
       'api::order.order': ApiOrderOrder;

@@ -4,16 +4,14 @@
   "info": {
     "singularName": "client",
     "pluralName": "clients",
-    "displayName": "Client"
+    "displayName": "Client",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
   "attributes": {
-    "first_name": {
-      "type": "string"
-    },
-    "last_name": {
+    "full_name": {
       "type": "string"
     },
     "phone": {
@@ -48,6 +46,18 @@
       "relation": "manyToOne",
       "target": "api::workspace.workspace",
       "inversedBy": "clients"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "Cliente",
+        "Proveedor",
+        "Cliente/Proveedor"
+      ],
+      "default": "Cliente"
+    },
+    "type_dni": {
+      "type": "string"
     }
   }
 }

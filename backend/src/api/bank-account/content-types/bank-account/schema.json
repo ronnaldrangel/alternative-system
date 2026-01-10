@@ -1,0 +1,23 @@
+{
+  "kind": "collectionType",
+  "collectionName": "bank_accounts",
+  "info": {
+    "singularName": "bank-account",
+    "pluralName": "bank-accounts",
+    "displayName": "Bank_Account"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "id_account": {
+      "type": "string"
+    },
+    "descripcion": {
+      "type": "string"
+    }
+  }
+}
