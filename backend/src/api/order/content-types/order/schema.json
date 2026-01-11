@@ -11,13 +11,7 @@
     "draftAndPublish": false
   },
   "attributes": {
-    "order_id": {
-      "type": "integer"
-    },
     "order_status": {
-      "type": "string"
-    },
-    "payment_method": {
       "type": "string"
     },
     "client": {
@@ -32,7 +26,7 @@
       "target": "api::product.product",
       "mappedBy": "order"
     },
-    "sub_total": {
+    "subtotal": {
       "type": "decimal"
     },
     "payment_media": {
@@ -52,10 +46,7 @@
     "code": {
       "type": "text"
     },
-    "commission": {
-      "type": "decimal"
-    },
-    "discount": {
+    "discount_total": {
       "type": "decimal"
     },
     "subscription": {
@@ -69,6 +60,18 @@
       "relation": "manyToOne",
       "target": "api::workspace.workspace",
       "inversedBy": "orders"
+    },
+    "bank_accounts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::bank-account.bank-account",
+      "mappedBy": "order"
+    },
+    "total_amount": {
+      "type": "decimal"
+    },
+    "tax_total": {
+      "type": "biginteger"
     }
   }
 }

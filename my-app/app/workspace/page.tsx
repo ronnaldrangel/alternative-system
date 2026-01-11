@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Briefcase, Loader2, ArrowRight } from "lucide-react"
+import Image from "next/image"
 
 import {
     Card,
@@ -107,40 +108,34 @@ export default function WorkspacePage() {
         <div className="min-h-screen bg-background p-4 md:p-8 flex flex-col items-center justify-center">
             <div className="w-full max-w-5xl space-y-8">
                 <div className="text-center space-y-2">
-                    <h1 className="text-3xl font-bold tracking-tight">Welcome back{user?.username ? `, ${user.username}` : ''}</h1>
-                    <p className="text-muted-foreground">Select a workspace to continue or create a new one.</p>
+                    <h1 className="text-3xl font-bold tracking-tight">Bienvenido{user?.username ? `, ${user.username}` : ''} 👋</h1>
+                    <p className="text-muted-foreground">Seleccione un espacio de trabajo para continuar o crear uno nuevo.</p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {workspaces.map((workspace) => (
                         <Card
                             key={workspace.id}
-                            className="group relative cursor-pointer hover:shadow-lg transition-all border-dashed md:border-solid hover:border-primary/50"
+                            className="group relative cursor-pointer hover:shadow-lg transition-all border-dashed md:border-solid hover:border-primary/50 text-center"
                             onClick={() => handleSelectWorkspace(workspace)}
                         >
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardHeader className="flex flex-col items-center space-y-2 pb-0">
+                                <Image
+                                    src="/icons/workspace.webp"
+                                    alt="Workspace"
+                                    width={80}
+                                    height={80}
+                                    className="rounded-lg object-cover shadow-sm grayscale group-hover:grayscale-0 transition-all duration-300"
+                                />
                                 <CardTitle className="text-lg font-medium">
                                     {workspace.name}
                                 </CardTitle>
-                                <Briefcase className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="pt-0">
                                 <div className="text-xs text-muted-foreground">
                                     {workspace.plan} Plan
                                 </div>
                             </CardContent>
-                            <CardFooter className="pt-2">
-                                <Button
-                                    variant="ghost"
-                                    className="w-full justify-between group-hover:bg-primary/5 group-hover:text-primary"
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        handleSelectWorkspace(workspace)
-                                    }}
-                                >
-                                    Enter Workspace <ArrowRight className="h-4 w-4 ml-2" />
-                                </Button>
-                            </CardFooter>
                         </Card>
                     ))}
 
@@ -151,21 +146,20 @@ export default function WorkspacePage() {
                                     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                                         <Plus className="h-6 w-6" />
                                     </div>
-                                    <h3 className="text-lg font-semibold">Create Workspace</h3>
-                                    <p className="text-sm text-muted-foreground text-center">Add a new workspace to manage your projects.</p>
+                                    <h3 className="text-lg font-semibold">Crear espacio de trabajo</h3>
                                 </div>
                             </Card>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Create Workspace</DialogTitle>
+                                <DialogTitle>Crear espacio de trabajo</DialogTitle>
                                 <DialogDescription>
-                                    Give your workspace a name to get started. You can change this later.
+                                    Dale un nombre a tu espacio de trabajo para empezar.
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="name">Workspace Name</Label>
+                                    <Label htmlFor="name">Nombre del espacio de trabajo</Label>
                                     <Input
                                         id="name"
                                         placeholder="My Awesome Project"
@@ -177,16 +171,16 @@ export default function WorkspacePage() {
                             </div>
                             <DialogFooter>
                                 <Button variant="outline" onClick={() => setShowNewTeamDialog(false)}>
-                                    Cancel
+                                    Cancelar
                                 </Button>
                                 <Button onClick={handleCreateTeam} disabled={isCreating || !newTeamName.trim()}>
                                     {isCreating ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Creating...
+                                            Creando...
                                         </>
                                     ) : (
-                                        "Create Workspace"
+                                        "Crear espacio de trabajo"
                                     )}
                                 </Button>
                             </DialogFooter>

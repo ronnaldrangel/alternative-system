@@ -4,10 +4,11 @@
   "info": {
     "singularName": "bank-account",
     "pluralName": "bank-accounts",
-    "displayName": "Bank_Account"
+    "displayName": "Bank_Account",
+    "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "attributes": {
     "name": {
@@ -18,6 +19,12 @@
     },
     "descripcion": {
       "type": "string"
+    },
+    "order": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::order.order",
+      "inversedBy": "bank_accounts"
     }
   }
 }

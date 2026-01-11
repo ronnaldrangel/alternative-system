@@ -7,18 +7,45 @@ export interface ProductData {
     salePrice?: number | string;
     description_short?: string;
     description_full?: string;
+    thumbnail?: any;
+}
+
+export async function uploadFile(file: File) {
+    const token = getToken();
+    const formData = new FormData();
+    formData.append("files", file);
+
+    try {
+        const response = await fetch(`${STRAPI_URL}/api/upload`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error?.message || "Failed to upload file");
+        }
+
+        return data[0]; // Strapi returns an array of uploaded files
+    } catch (error) {
+        throw error;
+    }
 }
 
 export async function getProducts(workspaceId: number | string) {
     const token = getToken();
     try {
-        // filter by workspace relation
-        const response = await fetch(`${STRAPI_URL}/api/products?filters[workspace][id][$eq]=${workspaceId}`, {
+        const response = await fetch(`${STRAPI_URL}/api/products?filters[workspace][id][$eq]=${workspaceId}&populate=*`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
+            cache: "no-store",
         });
 
         const data = await response.json();

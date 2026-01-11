@@ -70,6 +70,16 @@
       "relation": "oneToMany",
       "target": "api::workspace.workspace",
       "mappedBy": "user"
+    },
+    "avatar": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
     }
   }
 }

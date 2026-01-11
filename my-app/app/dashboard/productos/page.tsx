@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Package, Loader2, MoreHorizontal, Pencil, Trash, Search } from "lucide-react"
+import { Plus, Package, Loader2, MoreHorizontal, Pencil, Trash, Search, Upload, Image as ImageIcon } from "lucide-react"
 
 import {
     Card,
@@ -28,8 +28,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { getProducts, createProduct, updateProduct, deleteProduct, ProductData } from "@/lib/product-service"
+import { getProducts, createProduct, updateProduct, deleteProduct, ProductData, uploadFile } from "@/lib/product-service"
 import { getSelectedWorkspace } from "@/lib/workspace-service"
+import { STRAPI_URL } from "@/lib/auth-service"
 
 export default function ProductsPage() {
     const router = useRouter()
@@ -46,6 +47,8 @@ export default function ProductsPage() {
     const [regularPrice, setRegularPrice] = React.useState("")
     const [salePrice, setSalePrice] = React.useState("")
     const [descriptionShort, setDescriptionShort] = React.useState("")
+    const [thumbnailFile, setThumbnailFile] = React.useState<File | null>(null)
+    const [previewUrl, setPreviewUrl] = React.useState<string | null>(null)
 
     const fetchProducts = React.useCallback(async (wsId: number | string) => {
         setIsLoading(true)
@@ -79,6 +82,8 @@ export default function ProductsPage() {
         setRegularPrice("")
         setSalePrice("")
         setDescriptionShort("")
+        setThumbnailFile(null)
+        setPreviewUrl(null)
         setEditingProduct(null)
     }
 
@@ -89,16 +94,35 @@ export default function ProductsPage() {
         }
     }
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            setThumbnailFile(file)
+            const url = URL.createObjectURL(file)
+            setPreviewUrl(url)
+        }
+    }
+
     const handleCreateOrUpdateProduct = async () => {
         if (!name.trim() || !workspaceId) return
 
         setIsCreating(true)
         try {
+            let thumbnailId = undefined;
+
+            if (thumbnailFile) {
+                const uploadedFile = await uploadFile(thumbnailFile);
+                if (uploadedFile && uploadedFile.id) {
+                    thumbnailId = uploadedFile.id;
+                }
+            }
+
             const productData: ProductData = {
                 name: name,
                 regularPrice: regularPrice ? Number(regularPrice) : undefined,
                 salePrice: salePrice ? Number(salePrice) : undefined,
-                description_short: descriptionShort || undefined
+                description_short: descriptionShort || undefined,
+                thumbnail: thumbnailId
             }
 
             if (editingProduct) {
@@ -124,6 +148,15 @@ export default function ProductsPage() {
         setRegularPrice(product.regularPrice ? String(product.regularPrice) : "")
         setSalePrice(product.salePrice ? String(product.salePrice) : "")
         setDescriptionShort(product.description_short || "")
+
+        // Handle thumbnail preview
+        if (product.thumbnail?.data?.attributes?.url) {
+            const url = product.thumbnail.data.attributes.url
+            setPreviewUrl(url.startsWith("http") ? url : `${STRAPI_URL}${url}`)
+        } else {
+            setPreviewUrl(null)
+        }
+
         setShowNewProductDialog(true)
     }
 
@@ -179,6 +212,39 @@ export default function ProductsPage() {
                             <div className="space-y-2">
                                 <Label htmlFor="name">Name *</Label>
                                 <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Product Name" />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="thumbnail">Thumbnail</Label>
+                                <div className="flex gap-4 items-center">
+                                    <div className="shrink-0">
+                                        {previewUrl ? (
+                                            <div className="h-20 w-20 rounded-md overflow-hidden border relative">
+                                                <img
+                                                    src={previewUrl}
+                                                    alt="Preview"
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="h-20 w-20 rounded-md bg-muted flex items-center justify-center border border-dashed">
+                                                <ImageIcon className="h-8 w-8 text-muted-foreground opacity-50" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1">
+                                        <Input
+                                            id="thumbnail"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                            className="cursor-pointer"
+                                        />
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                            Upload a product thumbnail image.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
@@ -242,6 +308,7 @@ export default function ProductsPage() {
                             <table className="w-full caption-bottom text-sm text-left">
                                 <thead className="[&_tr]:border-b">
                                     <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Thumbnail</th>
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Name</th>
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Regular Price</th>
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Sale Price</th>
@@ -250,36 +317,57 @@ export default function ProductsPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="[&_tr:last-child]:border-0">
-                                    {filteredProducts.map((product) => (
-                                        <tr key={product.id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                            <td className="p-4 align-middle font-medium">{product.name}</td>
-                                            <td className="p-4 align-middle">{product.regularPrice || "-"}</td>
-                                            <td className="p-4 align-middle">{product.salePrice || "-"}</td>
-                                            <td className="p-4 align-middle">{product.description_short || "-"}</td>
-                                            <td className="p-4 align-middle text-right">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                                            <span className="sr-only">Open menu</span>
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                        <DropdownMenuItem onClick={() => handleEditClick(product)}>
-                                                            <Pencil className="mr-2 h-4 w-4" />
-                                                            Edit
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuSeparator />
-                                                        <DropdownMenuItem onClick={() => handleDeleteClick(product.documentId || product.id)} className="text-destructive">
-                                                            <Trash className="mr-2 h-4 w-4" />
-                                                            Delete
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                    {filteredProducts.map((product) => {
+                                        const thumbnailData = product.thumbnail?.data?.attributes || product.thumbnail?.data || product.thumbnail;
+                                        const imageUrl = thumbnailData?.url;
+                                        console.log("Product:", product.id, "Thumbnail:", product.thumbnail, "Resolved URL:", imageUrl);
+
+                                        return (
+                                            <tr key={product.id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                                <td className="p-4 align-middle">
+                                                    {imageUrl ? (
+                                                        <div className="h-10 w-10 rounded overflow-hidden bg-muted border">
+                                                            <img
+                                                                src={imageUrl.startsWith("http") ? imageUrl : `${STRAPI_URL}${imageUrl}`}
+                                                                alt={product.name}
+                                                                className="h-full w-full object-cover"
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <div className="h-10 w-10 rounded bg-muted flex items-center justify-center border">
+                                                            <ImageIcon className="h-5 w-5 text-muted-foreground opacity-50" />
+                                                        </div>
+                                                    )}
+                                                </td>
+                                                <td className="p-4 align-middle font-medium">{product.name}</td>
+                                                <td className="p-4 align-middle">{product.regularPrice || "-"}</td>
+                                                <td className="p-4 align-middle">{product.salePrice || "-"}</td>
+                                                <td className="p-4 align-middle">{product.description_short || "-"}</td>
+                                                <td className="p-4 align-middle text-right">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                                                <span className="sr-only">Open menu</span>
+                                                                <MoreHorizontal className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                            <DropdownMenuItem onClick={() => handleEditClick(product)}>
+                                                                <Pencil className="mr-2 h-4 w-4" />
+                                                                Edit
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem onClick={() => handleDeleteClick(product.documentId || product.id)} className="text-destructive">
+                                                                <Trash className="mr-2 h-4 w-4" />
+                                                                Delete
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
                                 </tbody>
                             </table>
                         </div>

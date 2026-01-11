@@ -372,12 +372,13 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
 export interface ApiBankAccountBankAccount extends Struct.CollectionTypeSchema {
   collectionName: 'bank_accounts';
   info: {
+    description: '';
     displayName: 'Bank_Account';
     pluralName: 'bank-accounts';
     singularName: 'bank-account';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -392,6 +393,7 @@ export interface ApiBankAccountBankAccount extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     name: Schema.Attribute.String;
+    order: Schema.Attribute.Relation<'manyToOne', 'api::order.order'>;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -402,12 +404,13 @@ export interface ApiBankAccountBankAccount extends Struct.CollectionTypeSchema {
 export interface ApiBillBill extends Struct.CollectionTypeSchema {
   collectionName: 'bills';
   info: {
+    description: '';
     displayName: 'Bill';
     pluralName: 'bills';
     singularName: 'bill';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     amount: Schema.Attribute.Decimal;
@@ -437,7 +440,7 @@ export interface ApiClientClient extends Struct.CollectionTypeSchema {
     singularName: 'client';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     country: Schema.Attribute.String;
@@ -522,30 +525,33 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+    bank_accounts: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::bank-account.bank-account'
+    >;
     client: Schema.Attribute.Relation<'manyToOne', 'api::client.client'>;
     code: Schema.Attribute.Text;
-    commission: Schema.Attribute.Decimal;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    discount: Schema.Attribute.Decimal;
+    discount_total: Schema.Attribute.Decimal;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::order.order'> &
       Schema.Attribute.Private;
-    order_id: Schema.Attribute.Integer;
     order_status: Schema.Attribute.String;
     payment_media: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios',
       true
     >;
-    payment_method: Schema.Attribute.String;
     products: Schema.Attribute.Relation<'oneToMany', 'api::product.product'>;
     publishedAt: Schema.Attribute.DateTime;
-    sub_total: Schema.Attribute.Decimal;
     subscription: Schema.Attribute.Relation<
       'manyToOne',
       'api::subscription.subscription'
     >;
+    subtotal: Schema.Attribute.Decimal;
+    tax_total: Schema.Attribute.BigInteger;
+    total_amount: Schema.Attribute.Decimal;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -643,12 +649,13 @@ export interface ApiSubscriptionSubscription
   extends Struct.CollectionTypeSchema {
   collectionName: 'subscriptions';
   info: {
+    description: '';
     displayName: 'Subscription';
     pluralName: 'subscriptions';
     singularName: 'subscription';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     cancelled_date: Schema.Attribute.Date;
@@ -687,7 +694,7 @@ export interface ApiWorkspaceWorkspace extends Struct.CollectionTypeSchema {
     singularName: 'workspace';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     clients: Schema.Attribute.Relation<'oneToMany', 'api::client.client'>;
@@ -1178,6 +1185,7 @@ export interface PluginUsersPermissionsUser
     draftAndPublish: false;
   };
   attributes: {
+    avatar: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
